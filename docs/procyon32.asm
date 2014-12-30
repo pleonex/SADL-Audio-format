@@ -130,20 +130,20 @@ decode_sample_block:
 
 decode_sample:
   ; Get the encoded sample byte shifted to the left by 8
-  MOV     R10, R4,LSL#28            ; Gets only a byte
-  MOV     R10, R10,LSR#16           ; ... and returns but shift by 8
-  MOV     R10, R10,LSL#16           ; Make sure it's a 16-bit values
-  MOV     R10, R10,ASR#16           ; ...
+  MOV     R10, R4,LSL#28            ; Gets only a byte shifted by 8
+  MOV     R10, R10,LSR#16           ; ...
+  MOV     R10, R10,LSL#16           ; The 16-bit value is signed, so set it
+  MOV     R10, R10,ASR#16           ; ... with ASR the bit sign it's keept
 
   ; Scale the value
-  LDR     R12, [SP,#0x48+scale]     ; Get the scale value
-  MOV     R12, R10,ASR R12          ; ... scale it.
+  LDR     R12, [SP,#0x48+scale]     ; Get the scale value and scale it.
+  MOV     R12, R10,ASR R12          ; ... At the end we multiply by 256 / scale
 
   ; Operate with the historical values
   MUL     R10, R6, R11              ; hist = hist1 * coeff1 + hist0 * coeff0
   MLA     R10, R7, R5, R10          ; ...
-  MOV     R6, R10,ASR#5             ; Add bit sign (2's complement)
-  ADD     R6, R10, R6,LSR#26        ; ... it's a bit extension operation
+  MOV     R6, R10,ASR#5             ; Adds 31 if negative. With ASR, the bit
+  ADD     R6, R10, R6,LSR#26        ; ... sign is copied, so ASR 5 = 0x1F = 31
 
   ; Add the sample with the historical
   MOV     R6, R6,ASR#6              ; sample = (sample * 64) + (hist / 64)
@@ -153,8 +153,8 @@ decode_sample:
   MOV     R6, R7                    ; hist1 = hist0
   MOV     R7, R10                   ; hist0 = sample
 
-  ; Sign extension and divide by 64 and add 0x20
-  MOV     R12, R10,ASR#5            ; Sign extension
+  ; Get the final sample
+  MOV     R12, R10,ASR#5            ; Adds 31 if negative as above
   ADD     R10, R10, R12,LSR#26      ; ...
   MOV     R10, R10,ASR#6            ; sample /= 64
   ADD     R10, R10, #0x20           ; sample += 32

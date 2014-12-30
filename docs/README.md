@@ -12,23 +12,17 @@ Nintendo DS game.
 The functions are called in this order and with this purpose.
 
 1. **playAudio**: Receive a structure with the path to the file to play.
-2. **initFile**: Create a new *audio_struct* and set some of its values.
-3. **getData** mode 1: Read the file header and copy to *audio_struct*.
-4. **setMode6**: Do something and then set *audio_struct* mode to 6.
-5. **getData** mode 6: Read the next block of audio data.
-6. **noLoop**: unknown, it has been set because there is no loop.
-7. **procyon32**: unknown, it has been set because it's Procyon 32 KHz.
-8. **procyon32**.
-9. **getData** mode 6.
-10. **getData** mode 6.
-11. **getData** mode 6.
-12. **noLoop**.
-13. **procyon32**.
-14. **procyon32**.
-15. **getData** mode 6.
-16. **getData** mode 6.
-17. **getData** mode 6.
-18. **noLoop**.
-19. **procyon32**.
-20. **procyon32**.
-21. ... You are intelligent, you are seeing a pattern.
+  1. **initFile**: Create a new *audio_struct* and set some of its values.
+  2. **getData** mode 1: Read the file header and copy to *audio_struct*.
+  3. **copyChannelInfo2**: Initialize channel info fields of *audio_struct*.
+  4. **setMode6**: Do something and then set *audio_struct* mode to 6.
+
+2. **audio_mainLoop**:
+  1. **getData** mode 6: Read the next block of audio data.
+  2. **playNoLoop**: unknown, it has been set because there is no loop.
+    1. 2x **procyon32**: decode samples for a channel in Procyon 32 KHz.
+  3. 3x **getData** mode 6.
+  4. **playNoLoop**.
+    1. 2x **procyon32**.
+  5. 3x **getData** mode 6.
+  6. You are intelligent, you are seeing a pattern.

@@ -37,13 +37,17 @@ namespace LibSADL
 			get { return "SADL.sadl"; }
 		}
 
-		public string FileName { get; set; }
+		public uint     FileSize { get; set; }
+		public string   FileName { get; set; }
+		public DateTime Creation { get; set; }
 
 		public int Channels { get; set; }
 
-		public byte Codec      { get; set; }
-		public int  SampleRate { get; set; }
-		public byte ChunkSize  { get; set; }
+		public byte   Codec      { get; set; }
+		public int    SampleRate { get; set; }
+		public ushort ChunkSize  { get; set; }
+		public ushort SamplesPerChunk { get; set; }
+		public ushort SamplesSizePerChunk { get; set; }
 
 		public byte[] Channel0LastChunk   { get; set; }
 		public ushort Channel0Historical0 { get; set; }
@@ -58,10 +62,21 @@ namespace LibSADL
 		public uint DataSize     { get; set; }
 		public uint LoopDataSize { get; set; }
 
-		public byte Unknown1 { get; set; }
-		public byte Unknown2 { get; set; }
-		public byte Unknown3 { get; set; }
-		public byte Unknown4 { get; set; }
+		public byte   Unknown30 { get; set; }
+		public byte   Unknown35 { get; set; }
+		public ushort Unknown36 { get; set; }
+		public ushort Unknown38 { get; set; }
+		public uint   Unknown44 { get; set; }
+		public uint   Unknown4C { get; set; }
+		public uint   Unknown50 { get; set; }
+		public byte   Unknown60 { get; set; }
+		public byte   Unknown61 { get; set; }
+		public byte   Unknown62 { get; set; }
+		public byte   Unknown63 { get; set; }
+		public byte   Unknown64 { get; set; }
+		public byte   Unknown65 { get; set; }
+
+		public DataStream AudioStream { get; set; }
 
 		public override void Initialize(GameFile file, params object[] parameters)
 		{

@@ -1,0 +1,3 @@
+[submodule "LibSADL/libs/libgame"]
+	path = LibSADL/libs/libgame
+	url = https://github.com/pleonex/libgame

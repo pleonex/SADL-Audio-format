@@ -56,7 +56,7 @@ namespace LibSADL
 		public ushort Channel1Historical0 { get; set; }
 		public ushort Channel1Historical1 { get; set; }
 
-		public bool HasLoop      { get; set; }
+		public bool CanLoop      { get; set; }
 		public uint StartOffset  { get; set; }
 		public uint LoopOffset   { get; set; }
 		public uint DataSize     { get; set; }
@@ -80,6 +80,7 @@ namespace LibSADL
 
 		public override void Initialize(GameFile file, params object[] parameters)
 		{
+			base.Initialize(file, parameters);
 			this.binaryConverter = new SadlBinaryConverter();
 			this.wavConverter    = new SadlWavConverter();
 		}

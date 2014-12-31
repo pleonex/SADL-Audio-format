@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibSADL", "LibSADL\LibSADL.csproj", "{2F4EC5FD-70A7-4FD7-847B-11ABDC8A5A1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sadler", "Sadler\Sadler.csproj", "{BD44C749-86C1-411C-9CA0-7FAC10D17622}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,8 +15,12 @@ Global
 		{2F4EC5FD-70A7-4FD7-847B-11ABDC8A5A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F4EC5FD-70A7-4FD7-847B-11ABDC8A5A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F4EC5FD-70A7-4FD7-847B-11ABDC8A5A1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD44C749-86C1-411C-9CA0-7FAC10D17622}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD44C749-86C1-411C-9CA0-7FAC10D17622}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD44C749-86C1-411C-9CA0-7FAC10D17622}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD44C749-86C1-411C-9CA0-7FAC10D17622}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = LibSADL\LibSADL.csproj
+		StartupItem = Sadler\Sadler.csproj
 	EndGlobalSection
 EndGlobal

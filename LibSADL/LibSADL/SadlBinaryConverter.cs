@@ -51,7 +51,7 @@ namespace LibSADL
 
 			// Audio info
 			format.Unknown30 = reader.ReadByte();
-			format.HasLoop   = reader.ReadByte() == 1;
+			format.CanLoop   = reader.ReadByte() == 1;
 			format.Channels  = reader.ReadByte();
 
 			byte codecInfo = reader.ReadByte();

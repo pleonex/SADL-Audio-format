@@ -39,6 +39,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sadl.cs" />
+    <Compile Include="SadlWavConverter.cs" />
+    <Compile Include="SadlBinaryConverter.cs" />
+    <Compile Include="IConverter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -72,13 +72,13 @@ Offset  Size   File   Description
 0x1D0 - 0x04 - XXXX - Channel 1 decoded samples pointer
 
 0x1D8 - 0x04 - XXXX - Pointer to current data block
-0x1DC - 0x04 - XXXX - Constant
+0x1DC - 0x04 - XXXX - Number of samples per chunk
                       Procyon 32KHz: 0x1E
-0x1E0 - 0x04 - XXXX - Constant
-                      Procyon 32KHz: 0x3C
+0x1E0 - 0x04 - XXXX - Decoded block size
+                      Procyon 32KHz: 0x3C (0x1E * 2)
 
-0x1EC - 0x04 - XXXX - Constant from 0x021AF3A0 table: 0x0780
-0x1F0 - 0x04 - XXXX - Constant from 0x021AF3A0 table: 0x03C0
+0x1EC - 0x04 - XXXX - Total bytes of decoded samples in each iteration: 0x0780
+0x1F0 - 0x04 - XXXX - Samples to decode in each iteration: 0x03C0
 0x1F4 - 0x04 - XXXX - Subroutine, should be something to apply effect
 0x1F8 - 0x04 - XXXX - Argument to 0x1F4 function
 0x1FC - 0x04 - XXXX - Constant: isLooped->0x02055140, else->0x02055308

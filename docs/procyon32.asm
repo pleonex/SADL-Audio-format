@@ -84,7 +84,7 @@ decode_chunk:
   STR     R0, [SP,#0x48+scale]      ; ... and write it
 
   ; ... Get coefficients
-  LDR     R0, =0x020682AC           ; Coefficient table
+  LDR     R0, =0x020682AC           ; Coefficient table, 6 bits fraction part
   MOV     R4, R4,LSL#1              ; ... 0xFFFF, 0xFFC3, 0x338C, 0x369D, 0x3B85
   LDRH    R4, [R0,R4]               ; ... Read both coefficients
   MVN     R0, R4                    ; Decode them
@@ -129,32 +129,32 @@ decode_sample_block:
   MOVNE   R9, #8                    ; else, the full word it's for samples
 
 decode_sample:
-  ; Get the encoded sample byte shifted to the left by 8
-  MOV     R10, R4,LSL#28            ; Gets only a byte shifted by 8
+  ; Get the error shifted to 12 (so it's set automatically the bit sign)
+  MOV     R10, R4,LSL#28            ; Gets only a byte shifted by 12
   MOV     R10, R10,LSR#16           ; ...
   MOV     R10, R10,LSL#16           ; The 16-bit value is signed, so set it
   MOV     R10, R10,ASR#16           ; ... with ASR the bit sign it's keept
 
-  ; Scale the value
+  ; Scale the error
   LDR     R12, [SP,#0x48+scale]     ; Get the scale value and scale it.
-  MOV     R12, R10,ASR R12          ; ... At the end we multiply by 256 / scale
+  MOV     R12, R10,ASR R12          ; ... At the end we multiply by 4096 / scale
 
-  ; Operate with the historical values
-  MUL     R10, R6, R11              ; hist = hist1 * coeff1 + hist0 * coeff0
+  ; Predict next value from history
+  MUL     R10, R6, R11              ; predic = hist1 * coeff1 + hist0 * coeff0
   MLA     R10, R7, R5, R10          ; ...
-  MOV     R6, R10,ASR#5             ; Adds 31 if negative. With ASR, the bit
-  ADD     R6, R10, R6,LSR#26        ; ... sign is copied, so ASR 5 = 0x1F = 31
+  MOV     R6, R10,ASR#5             ; Truncate to 16-bit again (we have 6 extra
+  ADD     R6, R10, R6,LSR#26        ; ... bits due to fractional part of coeff)
+  MOV     R6, R6,ASR#6              ; ... the add is for negatives to truncate
 
-  ; Add the sample with the historical
-  MOV     R6, R6,ASR#6              ; sample = (sample * 64) + (hist / 64)
-  ADD     R10, R6, R12,LSL#6        ; ...
+  ; Add the error to the prediction
+  ADD     R10, R6, R12,LSL#6        ; The error is scaled again to 64 (minimum)
 
   ; Update historical values
   MOV     R6, R7                    ; hist1 = hist0
   MOV     R7, R10                   ; hist0 = sample
 
-  ; Get the final sample
-  MOV     R12, R10,ASR#5            ; Adds 31 if negative as above
+  ; Approximate sample
+  MOV     R12, R10,ASR#5            ; Approximate
   ADD     R10, R10, R12,LSR#26      ; ...
   MOV     R10, R10,ASR#6            ; sample /= 64
   ADD     R10, R10, #0x20           ; sample += 32

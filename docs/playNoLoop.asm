@@ -21,16 +21,16 @@
   SUBS    R7, R0, R6        ; Get remaining data size
   BEQ     after_process     ; If 0, ok, no need to process more data
 
-  ; Get channel data block length
-  LDR     R0, [R4,#0x1F0]   ; Constant 0x3C0 from a end readHeader routine
-  LDR     R1, [R4,#0x1DC]   ; Constant 0x1E because it's procyon 32 KHz
-  BL      sdk_fastDiv       ; Divide the constant = 0x20
-  LDRH    R1, [R4,#0x9E]    ; Value 0x3A from file header (0x10)
-  MUL     R1, R0, R1        ; Multiplies = 0x200
+  ; Get bytes to read per channel
+  LDR     R0, [R4,#0x1F0]   ; Number of samples to decode
+  LDR     R1, [R4,#0x1DC]   ; Number of samples per chunk
+  BL      sdk_fastDiv       ; ... Gets number of chunks to decode
+  LDRH    R1, [R4,#0x9E]    ; Chunk size
+  MUL     R1, R0, R1        ; ... Gets number of bytes to read
 
-  ; Get block of data length
+  ; Get total bytes to read
   LDRB    R2, [R4,#0x23]    ; Get number of channels
-  MUL     R0, R2, R1        ; Mutiplies channel block data size X channels
+  MUL     R0, R2, R1        ; Mutiplies bytes to read X channels
   CMP     R0, R7            ; Check if we have less data than maximum
   MOVLE   R7, R0            ; Then set it
 
@@ -76,21 +76,23 @@
   B       quit
 
 thereAreDataBlock:
-  ; Get the channel data block size
-  MOV     R0, R7            ; Data block length
+  ; Get the byte to read per channel
+  MOV     R0, R7            ; Bytes to decode
   LDRB    R5, [R4,#0x23]    ; Number of channels
   MOV     R1, R5            ; ...
-  BL      sdk_fastDiv       ; 0x400 / 2 = 0x200 bytes per channel
+  BL      sdk_fastDiv       ; Bytes to read for each channel
 
   ;  Get number of chunks
-  MOV     R8, R0            ; Channel data size
-  LDRH    R1, [R4,#0x9E]    ; Chunk size?
-  BL      sdk_fastDiv2      ; Divide = 0x20
+  MOV     R8, R0            ; Bytes for channel
+  LDRH    R1, [R4,#0x9E]    ; Chunk size
+  BL      sdk_fastDiv2      ; Number of chunks in the channel
 
-  ; Get unknown constant that it's the same as 0x1EC...
-  LDR     R1, [R4,#0x1DC]
-  MUL     R0, R1, R0
-  MOV     R9, R0,LSL#1
+  ; Get total decoded samples size
+  LDR     R1, [R4,#0x1DC]   ; Get number of samples per channel
+  MUL     R0, R1, R0        ; Num chunks * samples per chunk
+  MOV     R9, R0,LSL#1      ; ... each decode sample is 16-bit
+
+  ; Channel index
   MOV     R10, #0
 
   ; If there is no channel, skip
@@ -109,14 +111,14 @@ decode_channel:
   ; Decode current channel block
   MOV     R0, R4                ; audio_struct
   LDR     R2, [R4,#0x1D8]       ; Encoded data samples
-  MOV     R3, R8                ; Data block size
+  MOV     R3, R8                ; Chunk block size
   LDR     R12, [R4,#0x204]      ; Decoding function
   BLX     R12                   ; ... call it
 
-  ; Mmmm... now compare if both constant are equals (whichs are)
-  LDR     R2, [R4,#0x1EC]       ; Constant from readHeader
-  CMP     R9, R2                ; Compare
-  BEQ     cond_decode_channel   ; Are equals, (they are)
+  ; Check if we have fulfill the output samples buffer
+  LDR     R2, [R4,#0x1EC]       ; Total decoded samples size
+  CMP     R9, R2                ; Current bytes read
+  BEQ     cond_decode_channel   ; Are equals
 
   MOV     R0, R5
   ADD     R1, R6, R9

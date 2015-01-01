@@ -39,9 +39,15 @@ namespace LibSADL
 
 		public int Channels      { get; set; }
 		public int SampleRate    { get; set; }
-		public int ByteRate      { get; set; }
-		public int BlockAlign    { get; set; }
 		public int BitsPerSample { get; set; }
+
+		public int ByteRate { 
+			get { return Channels * SampleRate * BitsPerSample / 8; }
+		}
+
+		public int FullSampleSize {
+			get { return Channels * BitsPerSample / 8; }
+		}
 
 		public DataStream AudioStream { get; set; }
 

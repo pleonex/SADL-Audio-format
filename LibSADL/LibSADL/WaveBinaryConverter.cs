@@ -3,6 +3,7 @@
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
+//       Specification from: https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
 //
 //  Copyright (c) 2015 Benito Palacios Sánchez
 //
@@ -39,15 +40,15 @@ namespace LibSADL
 				throw new FormatException();
 
 			// Sub-chunk 'fmt'
-			if (reader.ReadString(4) != "fmt")
+			if (reader.ReadString(4) != "fmt ")
 				throw new FormatException();
 
 			reader.ReadUInt32();	// sub-chunk size
 			format.Decoder       = reader.ReadUInt16() == 1 ? new PcmDecoder(format) : null;
 			format.Channels      = reader.ReadUInt16();
 			format.SampleRate    = reader.ReadInt32();
-			format.ByteRate      = reader.ReadInt32();
-			format.BlockAlign    = reader.ReadUInt16();
+			reader.ReadInt32();		// Byte rate
+			reader.ReadUInt16();	// Full sample size
 			format.BitsPerSample = reader.ReadUInt16();
 
 			// Sub-chunk 'data'
@@ -60,7 +61,25 @@ namespace LibSADL
 
 		public void Export(Wave format, DataStream strOut)
 		{
-			throw new NotImplementedException();
+			var writer = new DataWriter(strOut);
+			writer.Write(Wave.MagicHeader);
+			writer.Write((uint)(36 + format.AudioStream.Length));
+			writer.Write(Wave.RiffFormat);
+
+			// Sub-chunk 'fmt'
+			writer.Write("fmt ");
+			writer.Write((uint)16);		// Sub-chunk size
+			writer.Write((ushort)1);	// Audio format
+			writer.Write((ushort)format.Channels);
+			writer.Write(format.SampleRate);
+			writer.Write(format.ByteRate);
+			writer.Write((ushort)format.FullSampleSize);
+			writer.Write((ushort)format.BitsPerSample);
+
+			// Sub-chunk 'data'
+			writer.Write("data");
+			writer.Write((uint)format.AudioStream.Length);
+			format.AudioStream.WriteTo(strOut);
 		}
 	}
 }

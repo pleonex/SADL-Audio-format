@@ -44,19 +44,23 @@ namespace LibSADL
 
 		public override short[] DecodeBlock(int blockSize, int channel)
 		{
+			// Bytes to skip after chunk: number of chunks to skip after current
 			int blockChunks = Format.ChunkSize * (Format.Channels - 1);
-
 
 			// Skip first chunks from other channels
 			Format.AudioStream.Seek(Format.ChunkSize * channel, SeekMode.Current);
 
-			// Get number of chunks
-			int numChunks = blockSize / Format.ChunkSize;
+			// Get number of chunks per channel in this block
+			int numChunks = (blockSize / Format.ChunkSize) / Format.Channels;
+
+			// Decode the chunk for this channel
 			var samples = new short[numChunks * Format.SamplesPerChunk];
 			for (int i = 0; i < numChunks; i++) {
+				// Decode and copy
 				short[] chunkSamples = DecodeChunk(channel);
 				Array.Copy(chunkSamples, 0, samples, i * Format.SamplesPerChunk, Format.SamplesPerChunk);
 
+				// Skip chunks from other channels after current
 				Format.AudioStream.Seek(blockChunks, SeekMode.Current);
 			}
 
@@ -112,8 +116,7 @@ namespace LibSADL
 			Format.HistoricalValues[channel, 1] = Format.HistoricalValues[channel, 0];
 			Format.HistoricalValues[channel, 0] = sample;
 
-			short outp = (short)(sample / 64 + 32);
-			return outp;
+			return (short)(sample / 64 + 32);
 		}
 	}
 }

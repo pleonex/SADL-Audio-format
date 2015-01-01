@@ -54,9 +54,9 @@ namespace LibSADL
 			format.CanLoop   = reader.ReadByte() == 1;
 			format.Channels  = reader.ReadByte();
 
-			byte codecInfo = reader.ReadByte();
-			format.Codec = (byte)(codecInfo >> 4);
-			format.SampleRate = (codecInfo & 0xF) * 8000; // Only allowed 2 and 4
+			byte codecInfo    = reader.ReadByte();
+			format.Decoder    = (codecInfo >> 4) == 0xB ? new ProcyonDecoder(format) : null;
+			format.SampleRate = (codecInfo & 0x0F) * 8000; // Only allowed 2 and 4
 			reader.ReadByte(); // Probably reserved for future use
 
 			format.Unknown35 = reader.ReadByte();
@@ -70,10 +70,11 @@ namespace LibSADL
 			format.DataSize     = reader.ReadUInt32();
 			format.Unknown44    = reader.ReadUInt32();
 			format.StartOffset  = reader.ReadUInt32();
+			format.DataSize    -= format.StartOffset;	// Since it's include the header
 			format.Unknown4C    = reader.ReadUInt32();
 			format.Unknown50    = reader.ReadUInt32();
 			format.LoopOffset   = reader.ReadUInt32();
-			format.LoopDataSize = reader.ReadUInt32();
+			format.LoopDataSize = reader.ReadUInt32() - format.LoopOffset;
 			reader.ReadUInt32(); // Null
 
 			format.Unknown60 = reader.ReadByte();
@@ -90,10 +91,13 @@ namespace LibSADL
 
 			// For IMA ADPCM
 			reader.Stream.Seek(0x80, SeekMode.Origin);
-			format.Channel0Historical0 = reader.ReadUInt16();
-			format.Channel0Historical1 = reader.ReadUInt16();
-			format.Channel1Historical0 = reader.ReadUInt16();
-			format.Channel1Historical1 = reader.ReadUInt16();
+			format.HistoricalValues = new int[2, 2];
+			format.HistoricalValues[0, 0] = reader.ReadUInt16();
+			format.HistoricalValues[0, 1] = reader.ReadUInt16();
+			format.HistoricalValues[1, 0] = reader.ReadUInt16();
+			format.HistoricalValues[1, 1] = reader.ReadUInt16();
+
+			format.AudioStream = new DataStream(strIn, format.StartOffset, format.DataSize);
 		}
 
 		public void Export(Sadl format, DataStream strOut)

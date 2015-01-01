@@ -1,5 +1,5 @@
 ﻿//
-//  Program.cs
+//  ICodec.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -18,34 +18,27 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System.IO;
-using LibSADL;
-using Libgame;
 using Libgame.IO;
-using System;
 
-namespace Sadler
+namespace LibSADL
 {
-	class MainClass
+	public abstract class Decoder
 	{
-		public static void Main(string[] args)
+		protected Decoder(Sadl format)
 		{
-			var stream = new DataStream(args[0], FileMode.Open, FileAccess.Read);
-			var file   = new GameFile(Path.GetFileName(args[0]), stream);
-			file.SetFormat(typeof(Sadl));
-			file.Format.Read();
-
-			PrintInfo((Sadl)file.Format); 
+			Format = format;
 		}
 
-		static void PrintInfo(Sadl format)
+		public Sadl Format { get; private set;}
+
+		public abstract string Name { get; }
+
+		public short[] Decode(int channel)
 		{
-			Console.WriteLine("# Audio info:");
-			Console.WriteLine("\t* Name:        {0}", format.FileName);
-			Console.WriteLine("\t* Date:        {0}", format.Creation);
-			Console.WriteLine("\t* Codec:       {0}", format.Decoder.Name);
-			Console.WriteLine("\t* Sample rate: {0}", format.SampleRate);
-			Console.WriteLine("\t* Can loop?:   {0}", format.CanLoop);
+			return DecodeBlock((int)Format.DataSize, channel);
 		}
+
+		public abstract short[] DecodeBlock(int blockSize, int channel);
 	}
 }
+

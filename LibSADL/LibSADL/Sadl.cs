@@ -40,21 +40,17 @@ namespace LibSADL
 		public uint     FileSize { get; set; }
 		public string   FileName { get; set; }
 		public DateTime Creation { get; set; }
+	
+		public Decoder Decoder    { get; set; }
+		public int     SampleRate { get; set; }
+		public int     Channels   { get; set; }
+		public ushort  ChunkSize  { get; set; }
+		public ushort  SamplesPerChunk { get; set; }
+		public ushort  SamplesSizePerChunk { get; set; }
 
-		public int Channels { get; set; }
-
-		public byte   Codec      { get; set; }
-		public int    SampleRate { get; set; }
-		public ushort ChunkSize  { get; set; }
-		public ushort SamplesPerChunk { get; set; }
-		public ushort SamplesSizePerChunk { get; set; }
-
-		public byte[] Channel0LastChunk   { get; set; }
-		public ushort Channel0Historical0 { get; set; }
-		public ushort Channel0Historical1 { get; set; }
-		public byte[] Channel1LastChunk   { get; set; }
-		public ushort Channel1Historical0 { get; set; }
-		public ushort Channel1Historical1 { get; set; }
+		public byte[] Channel0LastChunk { get; set; }
+		public byte[] Channel1LastChunk { get; set; }
+		public int[,] HistoricalValues  { get; set; }
 
 		public bool CanLoop      { get; set; }
 		public uint StartOffset  { get; set; }

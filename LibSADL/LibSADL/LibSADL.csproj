@@ -42,6 +42,8 @@
     <Compile Include="SadlWavConverter.cs" />
     <Compile Include="SadlBinaryConverter.cs" />
     <Compile Include="IConverter.cs" />
+    <Compile Include="Decoder.cs" />
+    <Compile Include="ProcyonDecoder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

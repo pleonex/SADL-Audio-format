@@ -19,6 +19,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using Libgame.IO;
+using System;
 
 namespace LibSADL
 {
@@ -33,9 +34,43 @@ namespace LibSADL
 
 		public abstract string Name { get; }
 
-		public short[] Decode(int channel)
+		public void Decode(DataStream strOut)
 		{
-			return DecodeBlock((int)Format.DataSize, channel);
+			if (Format.Channels <= 0)
+				return;
+
+			var writer = new DataWriter(strOut);
+
+			int progress = 0;
+			uint decodedSize = 0;
+			while (decodedSize < Format.AudioStream.Length) {
+				// Calculate the size of the block
+				int blockLen = 0x2000;
+				if (decodedSize + blockLen > Format.AudioStream.Length)
+					blockLen = (int)(Format.AudioStream.Length - decodedSize);
+
+				// Decode
+				var samples = new short[Format.Channels][];
+				for (int i = 0; i < Format.Channels; i++) {
+					Format.AudioStream.Seek(decodedSize, SeekMode.Origin);
+					samples[i] = DecodeBlock(blockLen, i);
+				}
+
+				// And mix channels
+				for (int s = 0; s < samples[0].Length; s++)
+					for (int c = 0; c < Format.Channels; c++)
+						writer.Write(samples[c][s]);
+
+				// Increase decoded size
+				decodedSize += (uint)blockLen;
+
+				// Show progress
+				int newProgress = (int)(100 * decodedSize / Format.AudioStream.Length);
+				if (newProgress >= progress + 5) {
+					progress = newProgress;
+					Console.WriteLine("Decoded {0}%", progress);
+				}
+			}
 		}
 
 		public abstract short[] DecodeBlock(int blockSize, int channel);

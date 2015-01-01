@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using Libgame.IO;
+using System.IO;
 
 namespace LibSADL
 {
@@ -32,7 +33,22 @@ namespace LibSADL
 
 		public void Export(Sadl format, DataStream strOut)
 		{
-			throw new NotImplementedException();
+			// Decode samples
+			var sampleStream = new DataStream(new MemoryStream(), 0, 0);
+			format.Decoder.Decode(sampleStream);
+
+			// Create wave file
+			var wav = new Wave();
+			wav.AudioStream   = sampleStream;
+			wav.BitsPerSample = 16;
+			wav.Channels      = format.Channels;
+			wav.Decoder       = new PcmDecoder(wav);
+			wav.SampleRate    = format.SampleRate;
+
+			// Write file
+			new WaveBinaryConverter().Export(wav, strOut);
+
+			sampleStream.Dispose();
 		}
 	}
 }

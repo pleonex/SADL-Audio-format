@@ -30,12 +30,17 @@ namespace Sadler
 	{
 		public static void Main(string[] args)
 		{
+			if (args.Length != 2)
+				return;
+
 			var stream = new DataStream(args[0], FileMode.Open, FileAccess.Read);
 			var file   = new GameFile(Path.GetFileName(args[0]), stream);
 			file.SetFormat(typeof(Sadl));
 			file.Format.Read();
 
-			PrintInfo((Sadl)file.Format); 
+			PrintInfo((Sadl)file.Format);
+
+			file.Format.Export(args[1]);
 		}
 
 		static void PrintInfo(Sadl format)

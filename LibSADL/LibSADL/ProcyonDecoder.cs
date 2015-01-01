@@ -115,7 +115,11 @@ namespace LibSADL
 			Format.HistoricalValues[channel, 1] = Format.HistoricalValues[channel, 0];
 			Format.HistoricalValues[channel, 0] = sample;
 
-			return (short)(sample / 64 + 32);
+			// Gets the output
+			short output = (short)(sample >> 6); // The NDS amplitude resolution is 10bits
+			output += 32;	// And without negative values, reference to the middle 2^5=32
+
+			return output;
 		}
 	}
 }

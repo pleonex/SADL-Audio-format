@@ -79,7 +79,6 @@ namespace LibSADL
 
 			// ... get scale
 			byte scale = (byte)(header & 0xF);
-			scale = (byte)(0xC - scale);
 
 			// ... get coefficients
 			int coefIdx = header >> 4;
@@ -101,9 +100,9 @@ namespace LibSADL
 
 		short DecodeSample(byte val, byte scale, double coef1, double coef2, int channel)
 		{
-			int error = (short)(val << 12);	// Expand and set sign
-			error >>= scale;	// Scale it
-			error <<= 6;
+			// Convert the value to signed ans scale
+			int error = (val >> 3 == 1) ? val - 0x10 : val;
+			error <<= (6 + scale);
 
 			// Predict next sample
 			int prediction = (int)(Format.HistoricalValues[channel, 0] * coef1 +

@@ -27,7 +27,35 @@ namespace LibSADL
 	{
 		public void Import(DataStream strIn, Wave format)
 		{
-			throw new NotImplementedException();
+			var reader = new DataReader(strIn);
+
+			// Read RIFF header
+			if (reader.ReadString(4) != Wave.MagicHeader) 
+				throw new FormatException();
+
+			reader.ReadUInt32();	// File size - 8
+
+			if (reader.ReadString(4) != Wave.RiffFormat)
+				throw new FormatException();
+
+			// Sub-chunk 'fmt'
+			if (reader.ReadString(4) != "fmt")
+				throw new FormatException();
+
+			reader.ReadUInt32();	// sub-chunk size
+			format.Decoder       = reader.ReadUInt16() == 1 ? new PcmDecoder(format) : null;
+			format.Channels      = reader.ReadUInt16();
+			format.SampleRate    = reader.ReadInt32();
+			format.ByteRate      = reader.ReadInt32();
+			format.BlockAlign    = reader.ReadUInt16();
+			format.BitsPerSample = reader.ReadUInt16();
+
+			// Sub-chunk 'data'
+			if (reader.ReadString(4) != "data")
+				throw new FormatException();
+
+			uint dataSize = reader.ReadUInt32();
+			format.AudioStream = new DataStream(strIn, strIn.Position, dataSize);
 		}
 
 		public void Export(Wave format, DataStream strOut)

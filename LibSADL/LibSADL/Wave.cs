@@ -35,7 +35,7 @@ namespace LibSADL
 		public static string MagicHeader { get { return "RIFF"; } }
 		public static string RiffFormat  { get { return "WAVE"; } }
 
-		public Decoder Decoder { get; set; }
+		public PcmDecoder Decoder { get; set; }
 
 		public int Channels      { get; set; }
 		public int SampleRate    { get; set; }

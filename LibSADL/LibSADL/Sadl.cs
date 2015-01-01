@@ -34,7 +34,7 @@ namespace LibSADL
 		}
 
 		public override string FormatName {
-			get { return "SADL.sadl"; }
+			get { return "sound.sadl"; }
 		}
 
 		public uint     FileSize { get; set; }

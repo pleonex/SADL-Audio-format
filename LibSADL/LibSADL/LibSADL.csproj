@@ -44,6 +44,8 @@
     <Compile Include="IConverter.cs" />
     <Compile Include="Decoder.cs" />
     <Compile Include="ProcyonDecoder.cs" />
+    <Compile Include="Wave.cs" />
+    <Compile Include="WaveBinaryConverter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

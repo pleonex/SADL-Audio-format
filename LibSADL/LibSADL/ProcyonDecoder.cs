@@ -85,6 +85,7 @@ namespace LibSADL
 			double coef1 = CoefficientTable[coefIdx, 0];
 			double coef2 = CoefficientTable[coefIdx, 1];
 
+			// Get all the samples in the chunk
 			uint chunkData = 0;
 			var samples = new short[Format.SamplesPerChunk];
 			for (int i = 0; i < Format.SamplesPerChunk; i++, chunkData >>= 4) {

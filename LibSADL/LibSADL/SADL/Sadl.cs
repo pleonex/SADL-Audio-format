@@ -59,6 +59,7 @@ namespace LibSADL
 		public uint DataSize     { get; set; }
 		public uint LoopDataSize { get; set; }
 
+		public uint   Unknown0C { get; set; }
 		public byte   Unknown30 { get; set; }
 		public byte   Unknown35 { get; set; }
 		public ushort Unknown36 { get; set; }
@@ -72,6 +73,9 @@ namespace LibSADL
 		public byte   Unknown63 { get; set; }
 		public byte   Unknown64 { get; set; }
 		public byte   Unknown65 { get; set; }
+		public ushort Unknown66 { get; set; }
+		public byte   Unknown68 { get; set; }
+		public byte   Unknonw69 { get; set; }
 
 		public override void Initialize(GameFile file, params object[] parameters)
 		{

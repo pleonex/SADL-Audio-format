@@ -36,8 +36,8 @@ namespace LibSADL
 			reader.ReadUInt32(); // Null
 
 			// File info
-			format.FileSize = reader.ReadUInt32();
-			reader.ReadUInt32(); // Unknown (maybe some CRC?)
+			format.FileSize  = reader.ReadUInt32();
+			format.Unknown0C = reader.ReadUInt32();
 			reader.ReadUInt64(); // Null
 
 			uint date = reader.ReadUInt32();
@@ -83,6 +83,9 @@ namespace LibSADL
 			format.Unknown63 = reader.ReadByte();
 			format.Unknown64 = reader.ReadByte();
 			format.Unknown65 = reader.ReadByte();
+			format.Unknown66 = reader.ReadUInt16();
+			format.Unknown68 = reader.ReadByte();
+			format.Unknonw69 = reader.ReadByte();
 
 			// For Procyon
 			reader.Stream.Seek(0x80, SeekMode.Origin);
@@ -101,9 +104,76 @@ namespace LibSADL
 			format.Decoder  = (codec == 0xB) ? new ProcyonDecoder(format, audioStream) : null;
 		}
 
-		public void Export(Sadl format, BinaryFormat strOut)
+		public void Export(Sadl format, BinaryFormat bin)
 		{
-			throw new NotImplementedException();
+			var writer = new DataWriter(bin.Stream);
+			var audioStream = format.Decoder.RawStream;
+
+			// Header
+			writer.Write(Sadl.MagicStamp);
+			writer.Write((uint)0x00);
+			writer.Write((uint)(0x100 + audioStream.Length));
+			writer.Write(format.Unknown0C);
+			writer.Write((ulong)0x00);
+
+			// File info
+			DateTime date = format.Creation;
+			writer.Write((ushort)date.Year);
+			writer.Write((byte)date.Month);
+			writer.Write((byte)date.Day);
+			writer.Write((uint)
+				((date.Hour * 3600 + date.Minute * 60 + date.Second) * 1000 + date.Millisecond));
+
+			writer.Write(format.FileName, 0x10);
+
+			// Audio info
+			writer.Write(format.Unknown30);
+			writer.Write((byte)(format.CanLoop ? 1 : 0));
+			writer.Write((byte)format.Channels);
+
+			byte codecInfo = (byte)(format.Decoder.Id << 4);
+			codecInfo |= (byte)((format.SampleRate == 32000) ? 4 : 2);
+			writer.Write(codecInfo);
+			writer.Write((byte)0x00);
+
+			writer.Write(format.Unknown35);
+			writer.Write(format.Unknown36);
+			writer.Write(format.Unknown38);
+
+			writer.Write(format.ChunkSize);
+			writer.Write(format.SamplesPerChunk);
+			writer.Write(format.SamplesSizePerChunk);
+
+			writer.Write((uint)(0x100 + audioStream.Length));
+			writer.Write(format.Unknown44);
+			writer.Write((uint)0x100);
+			writer.Write(format.Unknown4C);
+			writer.Write(format.Unknown50);
+			writer.Write((uint)0x100);
+			writer.Write((uint)(0x100 + audioStream.Length));
+			writer.Write((uint)0x00);
+
+			writer.Write(format.Unknown60);
+			writer.Write(format.Unknown61);
+			writer.Write(format.Unknown62);
+			writer.Write(format.Unknown63);
+			writer.Write(format.Unknown64);
+			writer.Write(format.Unknown65);
+			writer.Write(format.Unknown66);
+			writer.Write(format.Unknown68);
+			writer.Write(format.Unknonw69);
+
+			writer.Write((ushort)0x00);
+			writer.Write((uint)0x00);
+			writer.Write((ulong)0x00);
+			writer.Write((ulong)0x00);
+
+			writer.Write(new byte[0x10]);
+			writer.Write(new byte[0x10]);
+
+			writer.Write(new byte[0x60]);
+
+			audioStream.WriteTo(bin.Stream);
 		}
 	}
 }

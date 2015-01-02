@@ -36,7 +36,9 @@ namespace LibSADL
 		public T Format { get; private set;}
 
 		public DataStream RawStream { get; private set; }
-			
+
+		public IProgressNotifier ProgressNotifier { get; set; }
+
 		public abstract string Name { get; }
 
 		public abstract int Id { get; }
@@ -46,8 +48,10 @@ namespace LibSADL
 			if (Format.Channels <= 0)
 				yield break;
 
+			if (ProgressNotifier != null)
+				ProgressNotifier.Reset();
+
 			RawStream.Seek(0, SeekMode.Origin);
-			int progress = 0;
 			uint decodedSize = 0;
 			while (decodedSize < RawStream.Length) {
 				// Calculate the size of the block
@@ -62,12 +66,12 @@ namespace LibSADL
 				decodedSize += (uint)blockLen;
 
 				// Show progress
-				int newProgress = (int)(100 * decodedSize / RawStream.Length);
-				if (newProgress >= progress + 5) {
-					progress = newProgress;
-					Console.WriteLine("Decoded {0}%", progress);
-				}
+				if (ProgressNotifier != null)
+					ProgressNotifier.Update((int)decodedSize, RawStream.Length);
 			}
+
+			if (ProgressNotifier != null)
+				ProgressNotifier.End();
 		}
 
 		public void Dispose()

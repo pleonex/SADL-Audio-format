@@ -1,5 +1,5 @@
 ﻿//
-//  ICodec.cs
+//  IProgressNotifier.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -18,20 +18,14 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System;
-using System.Collections.Generic;
-using Libgame.IO;
-
 namespace LibSADL
 {
-	public interface IDecoder : IDisposable
+	public interface IProgressNotifier
 	{
-		DataStream RawStream { get; }
-		IProgressNotifier ProgressNotifier { get; set; }
-		string Name { get; }
-		int Id { get; }
-
-		IEnumerable<short[,]> Run();
+		void Reset();
+		void Update(int progress);
+		void Update(long current, long total);
+		void End();
 	}
 }
 

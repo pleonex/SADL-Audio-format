@@ -1,5 +1,5 @@
 ﻿//
-//  ICodec.cs
+//  ConsoleProgressNotifier.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -19,19 +19,41 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
-using Libgame.IO;
 
 namespace LibSADL
 {
-	public interface IDecoder : IDisposable
+	public class ConsoleProgressNotifier : IProgressNotifier
 	{
-		DataStream RawStream { get; }
-		IProgressNotifier ProgressNotifier { get; set; }
-		string Name { get; }
-		int Id { get; }
+		int currentProgress;
+		int posX;
+		int posY;
 
-		IEnumerable<short[,]> Run();
+		public void Reset()
+		{
+			currentProgress = 0;
+			posX = Console.CursorLeft;
+			posY = Console.CursorTop;
+		}
+
+		public void Update(int progress)
+		{
+			if (progress >= currentProgress + 5) {
+				currentProgress = progress;
+
+				Console.SetCursorPosition(posX, posY);
+				Console.WriteLine("Decoded {0}%", progress);
+			}
+		}
+
+		public void Update(long current, long total)
+		{
+			Update((int)(100 * current / total));
+		}
+
+		public void End()
+		{
+			Console.WriteLine("Done! :)");
+		}
 	}
 }
 

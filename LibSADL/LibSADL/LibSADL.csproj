@@ -52,10 +52,13 @@
     <Compile Include="WAVE\PcmDecoder.cs" />
     <Compile Include="WAVE\PcmEncoder.cs" />
     <Compile Include="BinaryFormat.cs" />
+    <Compile Include="ProgressNotifier\IProgressNotifier.cs" />
+    <Compile Include="ProgressNotifier\ConsoleProgressNotifier.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="SADL\" />
     <Folder Include="WAVE\" />
+    <Folder Include="ProgressNotifier\" />
   </ItemGroup>
 </Project>

@@ -18,11 +18,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+using System;
 using System.IO;
-using LibSADL;
 using Libgame;
 using Libgame.IO;
-using System;
+using LibSADL;
 
 namespace Sadler
 {
@@ -37,6 +37,7 @@ namespace Sadler
 			var file   = new GameFile(Path.GetFileName(args[0]), stream);
 			file.SetFormat(typeof(Sadl));
 			file.Format.Read();
+			((Sadl)file.Format).Decoder.ProgressNotifier = new ConsoleProgressNotifier();
 
 			PrintInfo((Sadl)file.Format);
 

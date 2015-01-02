@@ -18,12 +18,13 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using Libgame.IO;
+using System;
 using System.Collections.Generic;
+using Libgame.IO;
 
 namespace LibSADL
 {
-	public interface IDecoder
+	public interface IDecoder : IDisposable
 	{
 		DataStream RawStream { get; }
 		string Name { get; }

@@ -70,6 +70,11 @@ namespace LibSADL
 			}
 		}
 
+		public void Dispose()
+		{
+			RawStream.Dispose();
+		}
+
 		protected abstract short[,] DecodeBlock(int blockSize);
 	}
 }

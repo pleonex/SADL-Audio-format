@@ -76,32 +76,34 @@ namespace LibSADL
 		public override void Initialize(GameFile file, params object[] parameters)
 		{
 			base.Initialize(file, parameters);
-			this.binaryConverter = new SadlBinaryConverter();
-			this.wavConverter    = new SadlWavConverter();
+			binaryConverter = new SadlBinaryConverter();
+			wavConverter    = new SadlWavConverter();
 		}
 
 		public override void Read(DataStream strIn)
 		{
-			this.binaryConverter.Import(strIn, this);
+			binaryConverter.Import(strIn, this);
 		}
 
 		public override void Write(DataStream strOut)
 		{
-			this.binaryConverter.Export(this, strOut);
+			binaryConverter.Export(this, strOut);
 		}
 
 		public override void Import(params DataStream[] strIn)
 		{
-			this.wavConverter.Import(strIn[0], this);
+			wavConverter.Import(strIn[0], this);
 		}
 
 		public override void Export(params DataStream[] strOut)
 		{
-			this.wavConverter.Export(this, strOut[0]);
+			wavConverter.Export(this, strOut[0]);
 		}
 
 		protected override void Dispose(bool freeManagedResourcesAlso)
 		{
+			if (freeManagedResourcesAlso)
+				Decoder.Dispose();
 		}
 	}
 }

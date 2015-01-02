@@ -49,7 +49,8 @@ namespace LibSADL
 			// Write file
 			new WaveBinaryConverter().Export(wav, strOut);
 
-			sampleStream.Dispose();
+			// Free resources
+			wav.Dispose();
 		}
 	}
 }

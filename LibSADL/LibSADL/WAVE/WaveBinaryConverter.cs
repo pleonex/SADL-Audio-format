@@ -24,11 +24,11 @@ using Libgame.IO;
 
 namespace LibSADL
 {
-	public class WaveBinaryConverter : IConverter<Wave>
+	public class WaveBinaryConverter : IConverter<Wave, BinaryFormat>
 	{
-		public void Import(DataStream strIn, Wave format)
+		public void Import(BinaryFormat bin, Wave format)
 		{
-			var reader = new DataReader(strIn);
+			var reader = new DataReader(bin.Stream);
 
 			// Read RIFF header
 			if (reader.ReadString(4) != Wave.MagicHeader) 
@@ -56,15 +56,15 @@ namespace LibSADL
 				throw new FormatException();
 
 			uint dataSize = reader.ReadUInt32();
-			var audioStream = new DataStream(strIn, strIn.Position, dataSize);
+			var audioStream = new DataStream(bin.Stream, bin.Stream.Position, dataSize);
 			format.Decoder  = (audioCodec == 1) ? new PcmDecoder(format, audioStream) : null;
 		}
 
-		public void Export(Wave format, DataStream strOut)
+		public void Export(Wave format, BinaryFormat bin)
 		{
 			var audioStream = format.Decoder.RawStream;
 
-			var writer = new DataWriter(strOut);
+			var writer = new DataWriter(bin.Stream);
 			writer.Write(Wave.MagicHeader);
 			writer.Write((uint)(36 + audioStream.Length));
 			writer.Write(Wave.RiffFormat);
@@ -82,7 +82,7 @@ namespace LibSADL
 			// Sub-chunk 'data'
 			writer.Write("data");
 			writer.Write((uint)(audioStream.Length));
-			format.Decoder.RawStream.WriteTo(strOut);
+			audioStream.WriteTo(bin.Stream);
 		}
 	}
 }

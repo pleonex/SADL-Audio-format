@@ -18,14 +18,16 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using Libgame.IO;
+using Libgame;
 
 namespace LibSADL
 {
-	public interface IConverter<T>
+	public interface IConverter<Src, Dst>
+		where Src : Format
+		where Dst : Format
 	{
-		void Import(DataStream strIn, T format);
-		void Export(T format, DataStream strOut);
+		void Import(Dst destination, Src source);
+		void Export(Src source, Dst destination);
 	}
 }
 

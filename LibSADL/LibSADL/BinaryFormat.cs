@@ -1,5 +1,5 @@
 ﻿//
-//  Wave.cs
+//  BinaryFormat.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -18,46 +18,37 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using Libgame.IO;
 using System;
+using Libgame;
+using Libgame.IO;
 
 namespace LibSADL
 {
-	public class Wave : SoundFormat
+	public class BinaryFormat : Format
 	{
-		IConverter<Wave, BinaryFormat> converter = new WaveBinaryConverter();
+		public BinaryFormat()
+		{
+		}
+
+		public BinaryFormat(DataStream stream)
+		{
+			Stream = stream;
+		}
 
 		public override string FormatName {
-			get { return "sound.wave";	}
+			get { return "base.binary"; }
 		}
 
-		public static string MagicHeader { get { return "RIFF"; } }
-		public static string RiffFormat  { get { return "WAVE"; } }
-
-		public override IDecoder Decoder { get; set; }
-		public override int Channels     { get; set; }
-		public override int SampleRate   { get; set; }
-
-		public int BitsPerSample { get; set; }
-
-		public int ByteRate { 
-			get { return Channels * SampleRate * BitsPerSample / 8; }
-		}
-
-		public int FullSampleSize {
-			get { return Channels * BitsPerSample / 8; }
-		}
+		public DataStream Stream { get; private set; }
 
 		public override void Read(DataStream strIn)
 		{
-			var bin = new BinaryFormat(strIn);
-			converter.Import(bin, this);
+			Stream = new DataStream(strIn, 0, strIn.Length);
 		}
 
 		public override void Write(DataStream strOut)
 		{
-			var bin = new BinaryFormat(strOut);
-			converter.Export(this, bin);
+			Stream.WriteTo(strOut);
 		}
 
 		public override void Import(params DataStream[] strIn)
@@ -73,7 +64,7 @@ namespace LibSADL
 		protected override void Dispose(bool freeManagedResourcesAlso)
 		{
 			if (freeManagedResourcesAlso)
-				Decoder.Dispose();
+				Stream.Dispose();
 		}
 	}
 }

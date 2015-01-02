@@ -26,8 +26,8 @@ namespace LibSADL
 {
 	public class Sadl : SoundFormat
 	{
-		IConverter<Sadl> binaryConverter;
-		IConverter<Sadl> wavConverter;
+		IConverter<Sadl, BinaryFormat> binaryConverter;
+		IConverter<Sadl, Wave> wavConverter;
 
 		public static string MagicStamp { 
 			get { return "sadl"; }
@@ -82,22 +82,38 @@ namespace LibSADL
 
 		public override void Read(DataStream strIn)
 		{
-			binaryConverter.Import(strIn, this);
+			var bin = new BinaryFormat(strIn);
+			binaryConverter.Import(bin, this);
 		}
 
 		public override void Write(DataStream strOut)
 		{
-			binaryConverter.Export(this, strOut);
+			var bin = new BinaryFormat(strOut);
+			binaryConverter.Export(this, bin);
 		}
 
 		public override void Import(params DataStream[] strIn)
 		{
-			wavConverter.Import(strIn[0], this);
+			var bin = new BinaryFormat(strIn[0]);
+			var wav = new Wave();
+			var wavBinConverter = new WaveBinaryConverter();
+			wavBinConverter.Import(bin, wav);
+
+			wavConverter.Import(wav, this);
+
+			wav.Dispose();
 		}
 
 		public override void Export(params DataStream[] strOut)
 		{
-			wavConverter.Export(this, strOut[0]);
+			var wav = new Wave();
+			wavConverter.Export(this, wav);
+
+			var bin = new BinaryFormat(strOut[0]);
+			var wavBinConverter = new WaveBinaryConverter();
+			wavBinConverter.Export(wav, bin);
+
+			wav.Dispose();
 		}
 
 		protected override void Dispose(bool freeManagedResourcesAlso)

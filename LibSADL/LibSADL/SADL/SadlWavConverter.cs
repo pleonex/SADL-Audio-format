@@ -24,19 +24,18 @@ using System.IO;
 
 namespace LibSADL
 {
-	public class SadlWavConverter : IConverter<Sadl>
+	public class SadlWavConverter : IConverter<Sadl, Wave>
 	{
-		public void Import(DataStream strIn, Sadl format)
+		public void Import(Wave strIn, Sadl format)
 		{
 			throw new NotImplementedException();
 		}
 
-		public void Export(Sadl format, DataStream strOut)
+		public void Export(Sadl format, Wave wav)
 		{
 			var sampleStream = new DataStream(new MemoryStream(), 0, 0);
 
 			// Create wave file
-			var wav = new Wave();
 			wav.BitsPerSample = 16;
 			wav.Channels      = format.Channels;
 			wav.SampleRate    = format.SampleRate;
@@ -45,12 +44,6 @@ namespace LibSADL
 			// Encode samples
 			var encoder = new PcmEncoder(format.Decoder.Run(), wav);
 			encoder.Run(sampleStream);
-
-			// Write file
-			new WaveBinaryConverter().Export(wav, strOut);
-
-			// Free resources
-			wav.Dispose();
 		}
 	}
 }

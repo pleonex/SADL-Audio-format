@@ -23,11 +23,11 @@ using Libgame.IO;
 
 namespace LibSADL
 {
-	public class SadlBinaryConverter : IConverter<Sadl>
+	public class SadlBinaryConverter : IConverter<Sadl, BinaryFormat>
 	{
-		public void Import(DataStream strIn, Sadl format)
+		public void Import(BinaryFormat bin, Sadl format)
 		{
-			var reader = new DataReader(strIn);
+			var reader = new DataReader(bin.Stream);
 
 			string magicStamp = reader.ReadString(4);
 			if (magicStamp != Sadl.MagicStamp)
@@ -97,11 +97,11 @@ namespace LibSADL
 			format.HistoricalValues[1, 0] = reader.ReadUInt16();
 			format.HistoricalValues[1, 1] = reader.ReadUInt16();
 
-			var audioStream = new DataStream(strIn, format.StartOffset, format.DataSize);
+			var audioStream = new DataStream(bin.Stream, format.StartOffset, format.DataSize);
 			format.Decoder  = (codec == 0xB) ? new ProcyonDecoder(format, audioStream) : null;
 		}
 
-		public void Export(Sadl format, DataStream strOut)
+		public void Export(Sadl format, BinaryFormat strOut)
 		{
 			throw new NotImplementedException();
 		}

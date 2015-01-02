@@ -51,6 +51,7 @@
     <Compile Include="WAVE\WaveBinaryConverter.cs" />
     <Compile Include="WAVE\PcmDecoder.cs" />
     <Compile Include="WAVE\PcmEncoder.cs" />
+    <Compile Include="BinaryFormat.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

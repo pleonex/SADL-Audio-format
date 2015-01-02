@@ -18,7 +18,6 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System;
 using Libgame.IO;
 using System.IO;
 
@@ -39,6 +38,8 @@ namespace LibSADL
 
 			// Encode samples
 			var encoder = new ProcyonEncoder(wav.Decoder.Run(), sadl);
+			encoder.ProgressNotifier = new ConsoleProgressNotifier("Encoded {0}%");
+			encoder.SamplesToEncode = (int)(wav.Decoder.RawStream.Length / wav.FullSampleSize);
 			encoder.Run(sampleStream);
 		}
 

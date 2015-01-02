@@ -24,9 +24,15 @@ namespace LibSADL
 {
 	public class ConsoleProgressNotifier : IProgressNotifier
 	{
+		string message;
 		int currentProgress;
 		int posX;
 		int posY;
+
+		public ConsoleProgressNotifier(string message)
+		{
+			this.message = message;
+		}
 
 		public void Reset()
 		{
@@ -41,7 +47,7 @@ namespace LibSADL
 				currentProgress = progress;
 
 				Console.SetCursorPosition(posX, posY);
-				Console.WriteLine("Decoded {0}%", progress);
+				Console.WriteLine(message, progress);
 			}
 		}
 

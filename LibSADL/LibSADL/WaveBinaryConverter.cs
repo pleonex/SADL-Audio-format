@@ -44,7 +44,7 @@ namespace LibSADL
 				throw new FormatException();
 
 			reader.ReadUInt32();	// sub-chunk size
-			format.Decoder       = reader.ReadUInt16() == 1 ? new PcmDecoder(format) : null;
+			ushort audioCodec = reader.ReadUInt16();
 			format.Channels      = reader.ReadUInt16();
 			format.SampleRate    = reader.ReadInt32();
 			reader.ReadInt32();		// Byte rate
@@ -56,14 +56,17 @@ namespace LibSADL
 				throw new FormatException();
 
 			uint dataSize = reader.ReadUInt32();
-			format.AudioStream = new DataStream(strIn, strIn.Position, dataSize);
+			var audioStream = new DataStream(strIn, strIn.Position, dataSize);
+			format.Decoder  = (audioCodec == 1) ? new PcmDecoder(format, audioStream) : null;
 		}
 
 		public void Export(Wave format, DataStream strOut)
 		{
+			var audioStream = format.Decoder.RawStream;
+
 			var writer = new DataWriter(strOut);
 			writer.Write(Wave.MagicHeader);
-			writer.Write((uint)(36 + format.AudioStream.Length));
+			writer.Write((uint)(36 + audioStream.Length));
 			writer.Write(Wave.RiffFormat);
 
 			// Sub-chunk 'fmt'
@@ -78,8 +81,8 @@ namespace LibSADL
 
 			// Sub-chunk 'data'
 			writer.Write("data");
-			writer.Write((uint)format.AudioStream.Length);
-			format.AudioStream.WriteTo(strOut);
+			writer.Write((uint)(audioStream.Length));
+			format.Decoder.RawStream.WriteTo(strOut);
 		}
 	}
 }

@@ -55,7 +55,7 @@ namespace LibSADL
 			format.Channels  = reader.ReadByte();
 
 			byte codecInfo    = reader.ReadByte();
-			format.Decoder    = (codecInfo >> 4) == 0xB ? new ProcyonDecoder(format) : null;
+			int codec = codecInfo >> 4;
 			format.SampleRate = (codecInfo & 0x0F) * 8000; // Only allowed 2 and 4
 			reader.ReadByte(); // Probably reserved for future use
 
@@ -97,7 +97,8 @@ namespace LibSADL
 			format.HistoricalValues[1, 0] = reader.ReadUInt16();
 			format.HistoricalValues[1, 1] = reader.ReadUInt16();
 
-			format.AudioStream = new DataStream(strIn, format.StartOffset, format.DataSize);
+			var audioStream = new DataStream(strIn, format.StartOffset, format.DataSize);
+			format.Decoder  = (codec == 0xB) ? new ProcyonDecoder(format, audioStream) : null;
 		}
 
 		public void Export(Sadl format, DataStream strOut)

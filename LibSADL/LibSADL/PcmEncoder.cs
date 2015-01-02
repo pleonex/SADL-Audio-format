@@ -1,10 +1,10 @@
 ﻿//
-//  SadlWavConverter.cs
+//  PcmEncoder.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
 //
-//  Copyright (c) 2014 Benito Palacios Sánchez
+//  Copyright (c) 2015 Benito Palacios Sánchez
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -20,36 +20,43 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using Libgame.IO;
-using System.IO;
+using System.Collections.Generic;
 
 namespace LibSADL
 {
-	public class SadlWavConverter : IConverter<Sadl>
+	public class PcmEncoder : IEncoder
 	{
-		public void Import(DataStream strIn, Sadl format)
+		public PcmEncoder(IEnumerable<short[,]> samples, Wave format)
 		{
-			throw new NotImplementedException();
+			Samples = samples;
+			Format  = format;
 		}
 
-		public void Export(Sadl format, DataStream strOut)
+		public string Name {
+			get { return "pcm"; }
+		}
+
+		public IEnumerable<short[,]> Samples {
+			get;
+			private set;
+		}
+
+		public Wave Format {
+			get;
+			private set;
+		}
+
+		public void Run(DataStream strOut)
 		{
-			var sampleStream = new DataStream(new MemoryStream(), 0, 0);
+			var writer = new DataWriter(strOut);
 
-			// Create wave file
-			var wav = new Wave();
-			wav.BitsPerSample = 16;
-			wav.Channels      = format.Channels;
-			wav.SampleRate    = format.SampleRate;
-			wav.Decoder = new PcmDecoder(wav, sampleStream);
-
-			// Encode samples
-			var encoder = new PcmEncoder(format.Decoder.Run(), wav);
-			encoder.Run(sampleStream);
-
-			// Write file
-			new WaveBinaryConverter().Export(wav, strOut);
-
-			sampleStream.Dispose();
+			// For each block of samples
+			foreach (var sample in Samples) {
+				// Mix channels
+				for (int i = 0; i < sample.GetLength(0); i++)
+					for (int c = 0; c < sample.GetLength(1); c++)
+						writer.Write(sample[i, c]);
+			}
 		}
 	}
 }

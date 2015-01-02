@@ -24,7 +24,7 @@ using Libgame.IO;
 
 namespace LibSADL
 {
-	public class Wave : Format
+	public class Wave : SoundFormat
 	{
 		IConverter<Wave> converter = new WaveBinaryConverter();
 
@@ -35,10 +35,10 @@ namespace LibSADL
 		public static string MagicHeader { get { return "RIFF"; } }
 		public static string RiffFormat  { get { return "WAVE"; } }
 
-		public PcmDecoder Decoder { get; set; }
+		public override IDecoder Decoder { get; set; }
+		public override int Channels     { get; set; }
+		public override int SampleRate   { get; set; }
 
-		public int Channels      { get; set; }
-		public int SampleRate    { get; set; }
 		public int BitsPerSample { get; set; }
 
 		public int ByteRate { 
@@ -48,8 +48,6 @@ namespace LibSADL
 		public int FullSampleSize {
 			get { return Channels * BitsPerSample / 8; }
 		}
-
-		public DataStream AudioStream { get; set; }
 
 		public override void Read(DataStream strIn)
 		{

@@ -23,7 +23,7 @@ using Libgame.IO;
 
 namespace LibSADL
 {
-	public class ProcyonDecoder : Decoder
+	public class ProcyonDecoder : Decoder<Sadl>
 	{
 		static readonly double[,] CoefficientTable = {
 			{0.00,      0.00},		// 0x00, 0x00
@@ -33,8 +33,8 @@ namespace LibSADL
 			{1.90625,  -0.9375}		// 0x7A, 0xC4
 		};
 
-		public ProcyonDecoder(Sadl format)
-			: base(format)
+		public ProcyonDecoder(Sadl format, DataStream stream)
+			: base(format, stream)
 		{
 		}
 
@@ -42,26 +42,27 @@ namespace LibSADL
 			get { return "Procyon"; }
 		}
 
-		public override short[] DecodeBlock(int blockSize, int channel)
+		public override int Id {
+			get { return 0xB; }
+		}
+
+		protected override short[,] DecodeBlock(int blockSize)
 		{
-			// Bytes to skip after chunk: number of chunks to skip after current
-			int blockChunks = Format.ChunkSize * (Format.Channels - 1);
+			// Get number of chunks in this block
+			int numChunks = blockSize / Format.ChunkSize;
 
-			// Skip first chunks from other channels
-			Format.AudioStream.Seek(Format.ChunkSize * channel, SeekMode.Current);
-
-			// Get number of chunks per channel in this block
-			int numChunks = (blockSize / Format.ChunkSize) / Format.Channels;
+			// Get number of samples per channel in the block
+			int numSamplesChannel = (numChunks * Format.SamplesPerChunk) / Format.Channels;
 
 			// Decode the chunk for this channel
-			var samples = new short[numChunks * Format.SamplesPerChunk];
+			var samples = new short[numSamplesChannel, Format.Channels];
 			for (int i = 0; i < numChunks; i++) {
 				// Decode and copy
-				short[] chunkSamples = DecodeChunk(channel);
-				Array.Copy(chunkSamples, 0, samples, i * Format.SamplesPerChunk, Format.SamplesPerChunk);
+				short[] chunkSamples = DecodeChunk(i % Format.Channels);
 
-				// Skip chunks from other channels after current
-				Format.AudioStream.Seek(blockChunks, SeekMode.Current);
+				int index = (i / Format.Channels) * Format.SamplesPerChunk;
+				for (int j = 0; j < chunkSamples.Length; j++)
+					samples[j + index, i % Format.Channels] = chunkSamples[j];
 			}
 
 			return samples;
@@ -69,13 +70,13 @@ namespace LibSADL
 
 		short[] DecodeChunk(int channel)
 		{
-			var reader  = new DataReader(Format.AudioStream);
+			var reader  = new DataReader(RawStream);
 
 			// Get header
-			Format.AudioStream.Seek(0xF, SeekMode.Current);
+			RawStream.Seek(0xF, SeekMode.Current);
 			sbyte header = reader.ReadSByte();
 			header = (sbyte)(header ^ 0x80);
-			Format.AudioStream.Seek(-0x10, SeekMode.Current);
+			RawStream.Seek(-0x10, SeekMode.Current);
 
 			// ... get scale
 			byte scale = (byte)(header & 0xF);

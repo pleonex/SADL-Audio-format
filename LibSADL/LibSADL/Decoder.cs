@@ -20,52 +20,49 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using Libgame.IO;
 using System;
+using System.Collections.Generic;
 
 namespace LibSADL
 {
-	public abstract class Decoder
+	public abstract class Decoder<T> : IDecoder
+		where T : SoundFormat
 	{
-		protected Decoder(Sadl format)
+		protected Decoder(T format, DataStream stream)
 		{
-			Format = format;
+			Format    = format;
+			RawStream = stream;
 		}
 
-		public Sadl Format { get; private set;}
+		public T Format { get; private set;}
 
+		public DataStream RawStream { get; private set; }
+			
 		public abstract string Name { get; }
 
-		public void Decode(DataStream strOut)
+		public abstract int Id { get; }
+
+		public IEnumerable<short[,]> Run()
 		{
 			if (Format.Channels <= 0)
-				return;
+				yield break;
 
-			var writer = new DataWriter(strOut);
-
+			RawStream.Seek(0, SeekMode.Origin);
 			int progress = 0;
 			uint decodedSize = 0;
-			while (decodedSize < Format.AudioStream.Length) {
+			while (decodedSize < RawStream.Length) {
 				// Calculate the size of the block
 				int blockLen = 0x2000;
-				if (decodedSize + blockLen > Format.AudioStream.Length)
-					blockLen = (int)(Format.AudioStream.Length - decodedSize);
+				if (decodedSize + blockLen > RawStream.Length)
+					blockLen = (int)(RawStream.Length - decodedSize);
 
 				// Decode
-				var samples = new short[Format.Channels][];
-				for (int i = 0; i < Format.Channels; i++) {
-					Format.AudioStream.Seek(decodedSize, SeekMode.Origin);
-					samples[i] = DecodeBlock(blockLen, i);
-				}
-
-				// And mix channels
-				for (int s = 0; s < samples[0].Length; s++)
-					for (int c = 0; c < Format.Channels; c++)
-						writer.Write(samples[c][s]);
+				yield return DecodeBlock(blockLen);
 
 				// Increase decoded size
 				decodedSize += (uint)blockLen;
 
 				// Show progress
-				int newProgress = (int)(100 * decodedSize / Format.AudioStream.Length);
+				int newProgress = (int)(100 * decodedSize / RawStream.Length);
 				if (newProgress >= progress + 5) {
 					progress = newProgress;
 					Console.WriteLine("Decoded {0}%", progress);
@@ -73,7 +70,7 @@ namespace LibSADL
 			}
 		}
 
-		public abstract short[] DecodeBlock(int blockSize, int channel);
+		protected abstract short[,] DecodeBlock(int blockSize);
 	}
 }
 

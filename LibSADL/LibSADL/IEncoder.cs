@@ -1,5 +1,5 @@
 ﻿//
-//  PcmDecoder.cs
+//  IEncoder.cs
 //
 //  Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -18,30 +18,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System;
+using System.Collections.Generic;
 using Libgame.IO;
 
 namespace LibSADL
 {
-	public class PcmDecoder : Decoder<Wave>
+	public interface IEncoder
 	{
-		public PcmDecoder(Wave format, DataStream stream)
-			: base(format, stream)
-		{
-		}
+		IEnumerable<short[,]> Samples { get; }
+		string Name { get; }
 
-		public override string Name {
-			get { return "PCM"; }
-		}
-
-		public override int Id {
-			get { return 1; }
-		}
-
-		protected override short[,] DecodeBlock(int blockSize)
-		{
-			throw new NotImplementedException();
-		}
+		void Run(DataStream strOut);
 	}
 }
 

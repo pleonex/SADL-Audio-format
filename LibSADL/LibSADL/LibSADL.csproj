@@ -42,11 +42,15 @@
     <Compile Include="SadlWavConverter.cs" />
     <Compile Include="SadlBinaryConverter.cs" />
     <Compile Include="IConverter.cs" />
-    <Compile Include="Decoder.cs" />
     <Compile Include="ProcyonDecoder.cs" />
     <Compile Include="Wave.cs" />
     <Compile Include="WaveBinaryConverter.cs" />
     <Compile Include="PcmDecoder.cs" />
+    <Compile Include="SoundFormat.cs" />
+    <Compile Include="PcmEncoder.cs" />
+    <Compile Include="IDecoder.cs" />
+    <Compile Include="Decoder.cs" />
+    <Compile Include="IEncoder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

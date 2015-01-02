@@ -24,7 +24,7 @@ using Libgame.IO;
 
 namespace LibSADL
 {
-	public class Sadl : Format
+	public class Sadl : SoundFormat
 	{
 		IConverter<Sadl> binaryConverter;
 		IConverter<Sadl> wavConverter;
@@ -41,9 +41,10 @@ namespace LibSADL
 		public string   FileName { get; set; }
 		public DateTime Creation { get; set; }
 	
-		public Decoder Decoder    { get; set; }
-		public int     SampleRate { get; set; }
-		public int     Channels   { get; set; }
+		public override IDecoder Decoder { get; set; }
+		public override int SampleRate { get; set; }
+		public override int Channels   { get; set; }
+
 		public ushort  ChunkSize  { get; set; }
 		public ushort  SamplesPerChunk { get; set; }
 		public ushort  SamplesSizePerChunk { get; set; }
@@ -71,8 +72,6 @@ namespace LibSADL
 		public byte   Unknown63 { get; set; }
 		public byte   Unknown64 { get; set; }
 		public byte   Unknown65 { get; set; }
-
-		public DataStream AudioStream { get; set; }
 
 		public override void Initialize(GameFile file, params object[] parameters)
 		{

@@ -26,9 +26,20 @@ namespace LibSADL
 {
 	public class SadlWavConverter : IConverter<Sadl, Wave>
 	{
-		public void Import(Wave strIn, Sadl format)
+		public void Import(Wave wav, Sadl sadl)
 		{
-			throw new NotImplementedException();
+			var sampleStream = new DataStream(new MemoryStream(), 0, 0);
+
+			// Create sadl file
+			// The SADL structure need to be same as the original,
+			// can't reproduce unknown fields
+			sadl.Channels   = wav.Channels;
+			sadl.SampleRate = wav.SampleRate;
+			sadl.Decoder    = new ProcyonDecoder(sadl, sampleStream);
+
+			// Encode samples
+			var encoder = new ProcyonEncoder(wav.Decoder.Run(), sadl);
+			encoder.Run(sampleStream);
 		}
 
 		public void Export(Sadl format, Wave wav)

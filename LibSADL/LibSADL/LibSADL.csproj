@@ -38,19 +38,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sadl.cs" />
-    <Compile Include="SadlWavConverter.cs" />
-    <Compile Include="SadlBinaryConverter.cs" />
+    <Compile Include="SADL\Sadl.cs" />
+    <Compile Include="SADL\SadlWavConverter.cs" />
+    <Compile Include="SADL\SadlBinaryConverter.cs" />
     <Compile Include="IConverter.cs" />
-    <Compile Include="ProcyonDecoder.cs" />
-    <Compile Include="Wave.cs" />
-    <Compile Include="WaveBinaryConverter.cs" />
-    <Compile Include="PcmDecoder.cs" />
+    <Compile Include="SADL\ProcyonDecoder.cs" />
     <Compile Include="SoundFormat.cs" />
-    <Compile Include="PcmEncoder.cs" />
     <Compile Include="IDecoder.cs" />
     <Compile Include="Decoder.cs" />
     <Compile Include="IEncoder.cs" />
+    <Compile Include="WAVE\Wave.cs" />
+    <Compile Include="WAVE\WaveBinaryConverter.cs" />
+    <Compile Include="WAVE\PcmDecoder.cs" />
+    <Compile Include="WAVE\PcmEncoder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="SADL\" />
+    <Folder Include="WAVE\" />
+  </ItemGroup>
 </Project>

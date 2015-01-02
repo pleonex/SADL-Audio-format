@@ -40,7 +40,17 @@ namespace LibSADL
 
 		protected override short[,] DecodeBlock(int blockSize)
 		{
-			throw new NotImplementedException();
+			int bytesPerSample = Format.BitsPerSample / 8;
+			int numSamples = (blockSize / bytesPerSample) / Format.Channels;
+			var samples = new short[numSamples, Format.Channels];
+
+			var reader = new DataReader(RawStream);
+			for (int i = 0; i < numSamples; i++) {
+				for (int c = 0; c < Format.Channels; c++)
+					samples[i, c] = reader.ReadInt16();
+			}
+
+			return samples;
 		}
 	}
 }

@@ -55,6 +55,7 @@
     <Compile Include="ProgressNotifier\IProgressNotifier.cs" />
     <Compile Include="ProgressNotifier\ConsoleProgressNotifier.cs" />
     <Compile Include="SADL\ProcyonEncoder.cs" />
+    <Compile Include="SampleEnumerator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

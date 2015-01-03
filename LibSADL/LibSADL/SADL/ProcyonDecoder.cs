@@ -118,7 +118,7 @@ namespace LibSADL
 			Format.HistoricalValues[channel, 0] = sample;
 
 			// Gets the output avoiding saturation
-			short output = (short)((sample >> 6) + 32);
+			short output = (short)(sample / 64 + 32);
 
 			return output;
 		}

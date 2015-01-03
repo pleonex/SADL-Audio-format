@@ -19,11 +19,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Diagnostics;
 
 namespace LibSADL
 {
 	public class ConsoleProgressNotifier : IProgressNotifier
 	{
+		Stopwatch watch;
 		string message;
 		int currentProgress;
 		int posX;
@@ -32,6 +34,7 @@ namespace LibSADL
 		public ConsoleProgressNotifier(string message)
 		{
 			this.message = message;
+			watch = new Stopwatch();
 		}
 
 		public void Reset()
@@ -39,6 +42,12 @@ namespace LibSADL
 			currentProgress = 0;
 			posX = Console.CursorLeft;
 			posY = Console.CursorTop;
+			Console.WriteLine(message, 0);
+
+			if (watch.IsRunning)
+				watch.Stop();
+
+			watch.Start();
 		}
 
 		public void Update(int progress)
@@ -58,7 +67,8 @@ namespace LibSADL
 
 		public void End()
 		{
-			Console.WriteLine("Done! :)");
+			watch.Stop();
+			Console.WriteLine("Done in {0}", watch.Elapsed);
 		}
 	}
 }

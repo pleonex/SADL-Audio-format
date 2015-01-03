@@ -122,15 +122,11 @@ namespace LibSADL
 			int prediction = (int)(Format.HistoricalValues[channel, 0] * coef1 +
 				Format.HistoricalValues[channel, 1] * coef2);
 
-			// Update historical values
-			Format.HistoricalValues[channel, 1] = Format.HistoricalValues[channel, 0];
-			Format.HistoricalValues[channel, 0] = value;
-
 			// Get the error from prediction
 			int error = value - prediction;
 
 			// Scale error
-			int errorScaled = (int)Math.Round((double)error / (1 << (6 + scale)));
+			int errorScaled = (int)Math.Floor((double)error / (1 << (6 + scale)));
 
 			// Set the limit of 4-bit for the error
 			byte result = (byte)(errorScaled & 0xF);
@@ -139,7 +135,12 @@ namespace LibSADL
 			int errorApprox = (result >> 3 == 1) ? result - 0x10 : result;
 			errorApprox <<= (6 + scale);
 
-			diff = Math.Abs(error - errorApprox);
+			// Update historical values
+			Format.HistoricalValues[channel, 1] = Format.HistoricalValues[channel, 0];
+			Format.HistoricalValues[channel, 0] = prediction + errorApprox;
+
+			short sampleApprox = (short)(((prediction + errorApprox) / 64) + 32);
+			diff = Math.Abs(sample - sampleApprox);
 
 			return result;
 		}
@@ -152,6 +153,8 @@ namespace LibSADL
 
 			int currentHist0 = Format.HistoricalValues[channel, 0];
 			int currentHist1 = Format.HistoricalValues[channel, 1];
+			int newHist0 = 0;
+			int newHist1 = 0;
 
 			const int numCoefficient = 5;
 			const int numScales = 16;
@@ -175,6 +178,8 @@ namespace LibSADL
 						scale   = tempScale;
 						coefIdx = tempCoefIdx;
 						encoded = result;
+						newHist0 = Format.HistoricalValues[channel, 0];
+						newHist1 = Format.HistoricalValues[channel, 1];
 					}
 
 					// If it's the best as possible, set it
@@ -183,6 +188,8 @@ namespace LibSADL
 				}
 			}
 
+			Format.HistoricalValues[channel, 0] = newHist0;
+			Format.HistoricalValues[channel, 1] = newHist1;
 			return encoded;
 		}
 

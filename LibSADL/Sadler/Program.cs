@@ -37,7 +37,7 @@ namespace Sadler
 			var file   = new GameFile(Path.GetFileName(args[0]), stream);
 			file.SetFormat(typeof(Sadl));
 			file.Format.Read();
-			((Sadl)file.Format).Decoder.ProgressNotifier = new ConsoleProgressNotifier();
+			((Sadl)file.Format).Decoder.ProgressNotifier = new ConsoleProgressNotifier("");
 
 			PrintInfo((Sadl)file.Format);
 

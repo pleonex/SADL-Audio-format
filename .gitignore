@@ -1,5 +1,4 @@
-LibSADL/LibSADL/bin/
-LibSADL/LibSADL/obj/
-LibSADL/Sadler/bin/
-LibSADL/Sadler/obj/
 *.userprefs
+.vs/
+bin/
+obj/

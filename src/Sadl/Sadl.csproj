@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>SceneGate.Ekona.Audio.Sadl</AssemblyName>
+
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <RootNamespace>SceneGate.Ekona.Audio.Sadl</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Yarhl" Version="4.0.0-preview.167" />
+  </ItemGroup>
+
+</Project>
